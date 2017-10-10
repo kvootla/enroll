@@ -2639,4 +2639,85 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(@enrollment1.aasm_state).to eq "coverage_canceled"
     end
   end
+
+describe HbxEnrollment, dbclean: :after_all do
+    let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active')}
+  let(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+
+  let!(:census_employees){
+    FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+    employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+  }
+
+  let!(:plan) {
+    FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: benefit_group.start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01")
+  }
+
+  let(:ce) { employer_profile.census_employees.non_business_owner.first }
+
+  let!(:family) {
+    person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+    employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+    ce.update_attributes({employee_role: employee_role})
+    Family.find_or_build_from_employee_role(employee_role)
+  }
+
+  let(:person) { family.primary_applicant.person }
+  context 'Mid Year Plan Change Notice' do
+
+     let!(:enrollment) {
+       FactoryGirl.create(:hbx_enrollment,
+       household: family.active_household,
+       coverage_kind: "health",
+       effective_on: benefit_group.start_on,
+       enrollment_kind: "open_enrollment",
+       kind: "employer_sponsored",
+       benefit_group_id: benefit_group.id,
+       employee_role_id: person.active_employee_roles.first.id,
+       benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+       plan_id: plan.id
+       )
+    }
+    context "Enrolment is congress" do
+
+      it "should have queued job" do
+        allow(enrollment).to receive_message_chain("benefit_group.is_congress") { true }
+
+        enrollment.mid_year_plan_change_notice
+        ActiveJob::Base.queue_adapter = :test
+          expect {
+            ShopNoticesNotifierJob.perform_later
+          }.to have_enqueued_job.on_queue("default")
+      end
+
+      it "should have log error" do
+          allow(enrollment).to receive('benefit_group'){ nil }
+          expect(Rails.logger).to receive(:error)
+          enrollment.mid_year_plan_change_notice
+      end
+    end
+
+    context "Enrolment is non congress" do
+      before do
+        allow(enrollment).to receive_message_chain("benefit_group.is_congress") { false }
+      end
+
+      it "should have queued job" do
+        enrollment.mid_year_plan_change_notice
+        ActiveJob::Base.queue_adapter = :test
+          expect {
+            ShopNoticesNotifierJob.perform_later
+          }.to have_enqueued_job.on_queue("default")
+      end
+
+      it "should have log error" do
+
+        allow(enrollment).to receive('benefit_group'){ nil }
+          expect(Rails.logger).to receive(:error)
+          enrollment.mid_year_plan_change_notice
+      end
+    end
+  end
+end
 end
