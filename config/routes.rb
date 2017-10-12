@@ -141,7 +141,11 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :interactive_identity_verifications, only: [:create, :new, :update]
+    resources :interactive_identity_verifications, only: [:create, :new, :update] do
+      collection do
+        get 'failed_validation'
+      end
+    end
 
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do

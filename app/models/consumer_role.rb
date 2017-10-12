@@ -22,6 +22,7 @@ class ConsumerRole
   SSN_VALIDATION_STATES = %w(na valid outstanding pending)
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
   LOCAL_RESIDENCY_VALIDATION_STATES = %w(attested valid outstanding pending) #attested state is used for people with active enrollments before locale residency verification was turned on
+  IDENTITY_VALIDATION_STATES = %w(na valid outstanding pending)
   VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
 
   US_CITIZEN_STATUS_KINDS = %W(
@@ -79,16 +80,22 @@ class ConsumerRole
   field :local_residency_validation, type: String, default: "attested"
   validates_inclusion_of :local_residency_validation, :in => LOCAL_RESIDENCY_VALIDATION_STATES, :allow_blank => true
 
+  # Identity
+  field :identity_validation, type: String, default: "outstanding"
+  validates_inclusion_of :identity_validation, :in => IDENTITY_VALIDATION_STATES, :allow_blank => true
+
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
   field :native_update_reason, type: String
   field :residency_update_reason, type: String
+  field :identity_update_reason, type: String
 
   #rejection flags for verification types
   field :ssn_rejected, type: Boolean, default: false
   field :native_rejected, type: Boolean, default: false
   field :lawful_presence_rejected, type: Boolean, default: false
   field :residency_rejected, type: Boolean, default: false
+  field :identity_rejected, type: Boolean, default: false
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -217,6 +224,10 @@ class ConsumerRole
 
   def lawful_presence_verified?
     self.lawful_presence_determination.verification_successful?
+  end
+
+  def identity_verified?
+    ["na", "valid"].include?(self.identity_validation)
   end
 
   def is_hbx_enrollment_eligible?
@@ -710,6 +721,8 @@ class ConsumerRole
         update_attributes(:lawful_presence_rejected => false)
       when "American Indian Status"
         update_attributes(:native_rejected => false)
+      when 'Identity'
+        update_attributes(:identity_rejected => false)
     end
   end
 
@@ -784,6 +797,8 @@ class ConsumerRole
         mark_residency_denied
       when "Social Security Number"
         update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason, :ssn_rejected => true)
+      when "Identity"
+        update_attributes(:identity_validation => "outstanding", :identity_update_reason => update_reason, :identity_rejected => true)
       when "American Indian Status"
         update_attributes(:native_validation => "outstanding", :native_update_reason => update_reason, :native_rejected => true)
       else
@@ -801,6 +816,8 @@ class ConsumerRole
         mark_residency_authorized
       when "Social Security Number"
         update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
+      when "Identity"
+        update_attributes(:identity_validation => "valid", :identity_update_reason => update_reason)
       when "American Indian Status"
         update_attributes(:native_validation => "valid", :native_update_reason => update_reason)
       else

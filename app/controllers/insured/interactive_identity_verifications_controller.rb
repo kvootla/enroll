@@ -12,8 +12,8 @@ module Insured
           else
             if service_response.failed?
               @step = 'start'
-              @verification_response = service_response
-              render "failed_validation"
+              @verification_transaction_id = service_response.transaction_id
+              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => @verification_transaction_id
             else
               @interactive_verification = service_response.to_model
               render :new
@@ -21,6 +21,12 @@ module Insured
           end
         end
       end
+    end
+
+    def failed_validation
+      @step = params[:start]
+      @verification_transaction_id = params[:verification_transaction_id]
+      render "failed_validation"
     end
 
     def create
@@ -37,8 +43,8 @@ module Insured
                 process_successful_interactive_verification(service_response)
               else
                 @step = 'questions'
-                @verification_response = service_response
-                render "failed_validation"
+                @verification_transaction_id = service_response.transaction_id
+                redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => @verification_transaction_id
               end
             end
           else
@@ -61,8 +67,8 @@ module Insured
               if service_response.successful?
                 process_successful_interactive_verification(service_response)
               else
-                @verification_response = service_response
-                render "failed_validation"
+                @verification_transaction_id = service_response.transaction_id
+                redirect_to :action =>  "failed_validation", :step => @step || nil, :verification_transaction_id => @verification_transaction_id
               end
             end
         end

@@ -1,7 +1,7 @@
 <!-- ***** Verification reason ***** -->
 <div class="row">
   <div class="verification-update-reason col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}"%>>
-    <div class="col-md-6">
+    <div class="col-md-5">
       Provide verification reason:
     </div>
     <%= form_tag update_verification_type_documents_path, method: :put do %>
@@ -11,7 +11,7 @@
         <div class="form-group col-md-3">
           <%= select_tag :verification_reason, options_for_select(::VlpDocument::VERIFICATION_REASONS), {prompt: ' Select Reason', required: true}%>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
           <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
         </div>
     <%end%>
@@ -22,7 +22,7 @@
 <!-- ***** Reject reason ***** -->
 <div class="row">
   <div class="return-for-def-reason col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}-return"%>>
-    <div class="col-md-6">
+    <div class="col-md-5">
       Reject reason:
     </div>
     <%= form_tag update_verification_type_documents_path, method: :put do %>
@@ -32,7 +32,7 @@
         <div class="form-group col-md-3">
           <%= select_tag :verification_reason, options_for_select(::VlpDocument::RETURNING_FOR_DEF_REASONS), {prompt: ' Select Reason', required: true}%>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
           <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
         </div>
     <%end%>

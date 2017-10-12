@@ -9,7 +9,7 @@ class Insured::VerificationDocumentsController < ApplicationController
     @docs_owner = find_docs_owner(params[:family_member])
     if params[:file]
       params[:file].each do |file|
-        doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
+        doc_uri = "https://www.dchealthlink.com/privacy"#Aws::S3Storage.save(file_path(file), 'id-verification')
         if doc_uri.present?
           if update_vlp_documents(file_name(file), doc_uri)
             flash[:notice] = "File Saved"
@@ -25,7 +25,11 @@ class Insured::VerificationDocumentsController < ApplicationController
     else
       flash[:error] = "File not uploaded. Please select the file to upload."
     end
-    redirect_to verification_insured_families_path
+    if params[:ridp_validation_check].present?
+      redirect_to(:back)
+    else
+      redirect_to verification_insured_families_path
+    end
   end
 
   def download
