@@ -82,21 +82,7 @@ namespace :import do
        {"_id"=>BSON::ObjectId('59decf21c09d07f15100d980'),"age"=>64,"start_on"=> beginning_of_year,"end_on"=> end_of_year,"cost"=>724.47}],
      "provider_directory_url"=>"https://dc.checkbookhealth.org/dc/ ",
      "rx_formulary_url"=>"https://healthy.kaiserpermanente.org/static/health/pdfs/formulary/mid/mid_exchange_formulary.pdf",
-     "sbc_document"=>
-      {"_id"=>BSON::ObjectId('59ded1c0c09d071d7c000724'),
-       "title"=>"KP DC Silver 6000_35 IVL.pdf",
-       "creator"=>"dchl",
-       "publisher"=>"dchl",
-       "type"=>"text",
-       "format"=>"application/pdf",
-       "source"=>"enroll_system",
-       "language"=>"en",
-       "tags"=>[],
-       "_type"=>"Document",
-       "subject"=>"SBC",
-       "identifier"=>"urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-sbc-local#538e567a-fc7a-4038-82fb-27a349995673",
-       "updated_at"=>Time.now,
-       "created_at"=>Time.now}}).save
+     }).save
 
     # BenefitPackages - HBX 2018
     hbx = HbxProfile.current_hbx
