@@ -103,8 +103,8 @@ namespace :import do
 
       # if we need to change these dates after running this rake task in test or prod environments,
       # we should write a separate script.
-      bc_period_2018.open_enrollment_start_on = Settings.aca.individual_market.open_enrollment.start_on
-      bc_period_2018.open_enrollment_end_on = Settings.aca.individual_market.open_enrollment.end_on
+      bc_period_2018.open_enrollment_start_on = Date.new(2017,11,1)
+      bc_period_2018.open_enrollment_end_on = Date.new(2017,12,15)
 
       bc_period_2018.slcsp = slcsp_2018.id
       bc_period_2018.slcsp_id = slcsp_2018.id
