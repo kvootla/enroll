@@ -239,6 +239,10 @@ class Insured::ConsumerRolesController < ApplicationController
     end
   end
 
+  def upload_identity_documents
+    set_current_person
+  end
+
   private
 
   def user_not_authorized(exception)

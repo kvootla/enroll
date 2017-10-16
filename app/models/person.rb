@@ -410,7 +410,7 @@ class Person
   # collect all verification types user can have based on information he provided
   def verification_types
     verification_types = []
-    verification_types << 'Identity' if consumer_role
+    verification_types << 'Identity' if consumer_role && consumer_role.is_applicant == true
     verification_types << 'Residency' if consumer_role
     verification_types << 'Social Security Number' if ssn
     verification_types << 'American Indian Status' if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)

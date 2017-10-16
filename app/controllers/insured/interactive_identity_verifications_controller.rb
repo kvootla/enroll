@@ -24,7 +24,7 @@ module Insured
     end
 
     def failed_validation
-      @step = params[:start]
+      @step = params[:step]
       @verification_transaction_id = params[:verification_transaction_id]
       render "failed_validation"
     end

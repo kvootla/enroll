@@ -190,6 +190,7 @@ Rails.application.routes.draw do
       post :match, on: :collection
       post :build, on: :collection
       get :ridp_agreement, on: :collection
+      get :upload_identity_documents, on: :collection
       get :immigration_document_options, on: :collection
       ##get :privacy, on: :collection
     end
