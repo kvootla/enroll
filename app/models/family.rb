@@ -17,6 +17,8 @@ class Family
   # include Mongoid::Versioning
   include Sortable
   include Mongoid::Autoinc
+  include Cases::CaseVisitable
+
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
@@ -194,6 +196,7 @@ class Family
   scope :with_partial_verifications,            ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "in review"}})}
   scope :with_no_verifications,                 ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "incomplete"}})}
   scope :with_reset_verifications,              ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
+
 
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
