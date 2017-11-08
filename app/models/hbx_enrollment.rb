@@ -632,7 +632,7 @@ class HbxEnrollment
   def mid_year_plan_change_notice
     if self.census_employee.present?
       begin
-        if self.enrollment_kind != "open_enrollment" || self.census_employee.new_hire_enrollment_period.present?
+        if (self.enrollment_kind != "open_enrollment" || self.census_employee.new_hire_enrollment_period.present?) && benefit_group.plan_year.open_enrollment_end_on > TimeKeeper.date_of_record
           if self.benefit_group.is_congress
             ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_mid_year_plan_change_notice_congressional")
           else
